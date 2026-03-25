@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" font-family="monospace" font-size="12">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#88aaff"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff6666"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#66ff88"/>
+    </marker>
+    <marker id="arrow-yellow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ffdd44"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#0a0a14" rx="10"/>
+  <text x="500" y="30" text-anchor="middle" fill="#88aaff" font-size="18" font-weight="bold">AR GLASSES — WIRING DIAGRAM</text>
+
+  <!-- === RASPBERRY PI 5 (Center) === -->
+  <rect x="350" y="200" width="240" height="180" rx="8" fill="#1a1a2e" stroke="#88aaff" stroke-width="2"/>
+  <text x="470" y="225" text-anchor="middle" fill="#88aaff" font-size="14" font-weight="bold">RASPBERRY PI 5</text>
+  <text x="470" y="245" text-anchor="middle" fill="#667" font-size="10">Quad Cortex-A76 / 8GB</text>
+
+  <!-- Pi ports -->
+  <text x="365" y="275" fill="#aaa" font-size="10">CSI-2 (CAM)</text>
+  <text x="365" y="295" fill="#aaa" font-size="10">PCIe (M.2 HAT)</text>
+  <text x="365" y="315" fill="#aaa" font-size="10">Micro HDMI 0</text>
+  <text x="365" y="335" fill="#aaa" font-size="10">USB-C (Power)</text>
+  <text x="365" y="355" fill="#aaa" font-size="10">GPIO (optional)</text>
+  <text x="365" y="370" fill="#555" font-size="9">40-pin header</text>
+
+  <!-- === HAILO-8L (Top) === -->
+  <rect x="380" y="60" width="180" height="90" rx="8" fill="#1a1a2e" stroke="#44ddaa" stroke-width="2"/>
+  <text x="470" y="85" text-anchor="middle" fill="#44ddaa" font-size="14" font-weight="bold">HAILO-8L M.2</text>
+  <text x="470" y="105" text-anchor="middle" fill="#667" font-size="10">13 TOPS / 2.5W</text>
+  <text x="470" y="125" text-anchor="middle" fill="#667" font-size="10">via M.2 HAT+</text>
+
+  <!-- Hailo to Pi connection -->
+  <line x1="470" y1="150" x2="470" y2="200" stroke="#44ddaa" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="485" y="178" fill="#44ddaa" font-size="9">PCIe Gen2 x1</text>
+
+  <!-- === CAMERA (Left) === -->
+  <rect x="60" y="230" width="200" height="90" rx="8" fill="#1a1a2e" stroke="#ffdd44" stroke-width="2"/>
+  <text x="160" y="255" text-anchor="middle" fill="#ffdd44" font-size="14" font-weight="bold">ArduCam OV9281</text>
+  <text x="160" y="275" text-anchor="middle" fill="#667" font-size="10">1MP Global Shutter</text>
+  <text x="160" y="295" text-anchor="middle" fill="#667" font-size="10">120fps / MIPI CSI-2</text>
+
+  <!-- Camera to Pi -->
+  <line x1="260" y1="270" x2="350" y2="270" stroke="#ffdd44" stroke-width="2" marker-end="url(#arrow-yellow)"/>
+  <text x="290" y="263" fill="#ffdd44" font-size="9">15-pin FPC</text>
+
+  <!-- === DISPLAY (Right) === -->
+  <rect x="680" y="220" width="220" height="100" rx="8" fill="#1a1a2e" stroke="#88aaff" stroke-width="2"/>
+  <text x="790" y="245" text-anchor="middle" fill="#88aaff" font-size="14" font-weight="bold">MicroOLED 0.39"</text>
+  <text x="790" y="265" text-anchor="middle" fill="#667" font-size="10">1920x1080 / MIPI DSI</text>
+  <text x="790" y="285" text-anchor="middle" fill="#667" font-size="10">+ HDMI-to-MIPI Driver</text>
+  <text x="790" y="305" text-anchor="middle" fill="#667" font-size="10">+ Beam Splitter Prism</text>
+
+  <!-- Pi to Display -->
+  <line x1="590" y1="310" x2="680" y2="280" stroke="#88aaff" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="620" y="285" fill="#88aaff" font-size="9">Micro HDMI</text>
+
+  <!-- === POWER SYSTEM (Bottom) === -->
+  <rect x="300" y="470" width="340" height="160" rx="8" fill="#1a1a2e" stroke="#ff6666" stroke-width="2"/>
+  <text x="470" y="495" text-anchor="middle" fill="#ff6666" font-size="14" font-weight="bold">POWER SYSTEM</text>
+
+  <!-- Battery -->
+  <rect x="320" y="510" width="130" height="50" rx="4" fill="#2a1a1a" stroke="#ff6666" stroke-width="1"/>
+  <text x="385" y="532" text-anchor="middle" fill="#ff9999" font-size="11">LiPo 3.7V</text>
+  <text x="385" y="548" text-anchor="middle" fill="#ff9999" font-size="10">5000mAh</text>
+
+  <!-- Charger -->
+  <rect x="320" y="575" width="130" height="40" rx="4" fill="#2a1a1a" stroke="#ff6666" stroke-width="1"/>
+  <text x="385" y="600" text-anchor="middle" fill="#ff9999" font-size="10">TP4056 Charger</text>
+
+  <!-- Boost converter -->
+  <rect x="490" y="510" width="130" height="50" rx="4" fill="#2a1a1a" stroke="#ff6666" stroke-width="1"/>
+  <text x="555" y="532" text-anchor="middle" fill="#ff9999" font-size="11">Boost Converter</text>
+  <text x="555" y="548" text-anchor="middle" fill="#ff9999" font-size="10">3.7V → 5V/5A</text>
+
+  <!-- Switch -->
+  <rect x="490" y="575" width="130" height="40" rx="4" fill="#2a1a1a" stroke="#ff6666" stroke-width="1"/>
+  <text x="555" y="600" text-anchor="middle" fill="#ff9999" font-size="10">Power Switch</text>
+
+  <!-- Battery to Boost -->
+  <line x1="450" y1="535" x2="490" y2="535" stroke="#ff6666" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <!-- Charger to Battery -->
+  <line x1="385" y1="575" x2="385" y2="560" stroke="#ff6666" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <!-- Switch inline -->
+  <line x1="555" y1="575" x2="555" y2="560" stroke="#ff6666" stroke-width="1.5"/>
+
+  <!-- Power to Pi -->
+  <line x1="555" y1="510" x2="500" y2="380" stroke="#ff6666" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="540" y="440" fill="#ff6666" font-size="9">USB-C PD</text>
+  <text x="540" y="452" fill="#ff6666" font-size="9">5V / 5A</text>
+
+  <!-- USB-C charge input -->
+  <rect x="150" y="580" width="120" height="40" rx="4" fill="#1a1a2e" stroke="#ff6666" stroke-width="1"/>
+  <text x="210" y="605" text-anchor="middle" fill="#ff9999" font-size="10">USB-C Charge In</text>
+  <line x1="270" y1="595" x2="320" y2="595" stroke="#ff6666" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <!-- === DATA FLOW LEGEND === -->
+  <rect x="700" y="470" width="250" height="160" rx="8" fill="#111122" stroke="#333" stroke-width="1"/>
+  <text x="825" y="495" text-anchor="middle" fill="#888" font-size="12" font-weight="bold">LEGEND</text>
+  <line x1="720" y1="515" x2="770" y2="515" stroke="#ffdd44" stroke-width="2"/>
+  <text x="780" y="519" fill="#aaa" font-size="10">Camera Data (CSI-2)</text>
+  <line x1="720" y1="540" x2="770" y2="540" stroke="#44ddaa" stroke-width="2"/>
+  <text x="780" y="544" fill="#aaa" font-size="10">AI Inference (PCIe)</text>
+  <line x1="720" y1="565" x2="770" y2="565" stroke="#88aaff" stroke-width="2"/>
+  <text x="780" y="569" fill="#aaa" font-size="10">Display Output (HDMI)</text>
+  <line x1="720" y1="590" x2="770" y2="590" stroke="#ff6666" stroke-width="2"/>
+  <text x="780" y="594" fill="#aaa" font-size="10">Power (USB-C PD)</text>
+
+  <!-- === PIPELINE FLOW (Top) === -->
+  <text x="160" y="190" text-anchor="middle" fill="#ffdd44" font-size="11">1. Capture</text>
+  <text x="160" y="205" text-anchor="middle" fill="#ffdd44" font-size="9">120fps raw</text>
+  <text x="470" y="190" text-anchor="middle" fill="#44ddaa" font-size="11">2. Detect</text>
+  <text x="470" y="48" text-anchor="middle" fill="#44ddaa" font-size="9">~4ms inference</text>
+  <text x="790" y="210" text-anchor="middle" fill="#88aaff" font-size="11">3. Display</text>
+  <text x="790" y="345" text-anchor="middle" fill="#88aaff" font-size="9">HUD overlay → eye</text>
+
+  <!-- Thermal note -->
+  <rect x="60" y="400" width="200" height="70" rx="6" fill="#1a1a10" stroke="#886600" stroke-width="1"/>
+  <text x="160" y="420" text-anchor="middle" fill="#ccaa33" font-size="11" font-weight="bold">THERMAL NOTE</text>
+  <text x="160" y="438" text-anchor="middle" fill="#998833" font-size="9">Pi 5: needs heatsink (47°C+)</text>
+  <text x="160" y="452" text-anchor="middle" fill="#998833" font-size="9">Hailo-8L: thermal pad (warm)</text>
+  <text x="160" y="466" text-anchor="middle" fill="#998833" font-size="9">Frame vents recommended</text>
+</svg>
