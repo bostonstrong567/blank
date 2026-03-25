@@ -1,0 +1,88 @@
+[general]
+version = 4
+name = AR Glasses - Kobra 2 Pro
+definition = fdmprinter
+
+[metadata]
+type = quality_changes
+quality_type = normal
+setting_version = 22
+
+[values]
+# === PRINTER: Anycubic Kobra 2 Pro ===
+machine_name = Anycubic Kobra 2 Pro
+machine_width = 220
+machine_depth = 220
+machine_height = 250
+
+# === QUALITY ===
+layer_height = 0.2
+layer_height_0 = 0.28
+line_width = 0.4
+
+# === SHELL ===
+wall_thickness = 1.2
+wall_line_count = 3
+top_layers = 4
+bottom_layers = 3
+top_bottom_thickness = 0.8
+
+# === INFILL ===
+infill_sparse_density = 25
+infill_pattern = gyroid
+infill_line_distance = 1.6
+
+# === MATERIAL (PETG) ===
+material_print_temperature = 235
+material_print_temperature_layer_0 = 240
+material_bed_temperature = 80
+material_bed_temperature_layer_0 = 85
+material_flow = 98
+
+# === SPEED ===
+speed_print = 80
+speed_infill = 100
+speed_wall_0 = 40
+speed_wall_x = 60
+speed_topbottom = 50
+speed_travel = 150
+speed_layer_0 = 30
+
+# === RETRACTION ===
+retraction_enable = True
+retraction_speed = 40
+retraction_amount = 1.0
+retraction_min_travel = 1.5
+
+# === COOLING ===
+cool_fan_enabled = True
+cool_fan_speed = 50
+cool_fan_speed_max = 80
+cool_fan_speed_min = 30
+cool_min_layer_time = 10
+cool_fan_full_at_height = 1.0
+
+# === SUPPORT ===
+support_enable = True
+support_type = buildplate
+support_angle = 55
+support_pattern = zigzag
+support_density = 15
+support_z_distance = 0.2
+support_xy_distance = 0.7
+support_interface_enable = True
+support_interface_density = 80
+support_interface_height = 0.6
+
+# === ADHESION ===
+adhesion_type = brim
+brim_width = 5
+brim_line_count = 8
+
+# === MESH FIX ===
+meshfix_union_all = True
+meshfix_union_all_remove_holes = False
+
+# === SPECIAL ===
+adaptive_layer_height_enabled = False
+print_sequence = one_at_a_time
