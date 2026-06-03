@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NixOS Desktop Preview — Catppuccin Rice</title>
+<style>
+  /* ---- Catppuccin Mocha palette ---- */
+  :root{
+    --base:#1e1e2e; --mantle:#181825; --crust:#11111b;
+    --text:#cdd6f4; --subtext:#a6adc8; --overlay:#6c7086;
+    --surface0:#313244; --surface1:#45475a;
+    --blue:#89b4fa; --lavender:#b4befe; --sapphire:#74c7ec;
+    --green:#a6e3a1; --yellow:#f9e2af; --peach:#fab387;
+    --red:#f38ba8; --mauve:#cba6f7; --pink:#f5c2e7; --teal:#94e2d5;
+    --glass:rgba(30,30,46,.55);
+    --glass-strong:rgba(30,30,46,.78);
+    --border:rgba(205,214,244,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;font-family:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;color:var(--text);}
+
+  /* ---- Animated wallpaper ---- */
+  body{
+    background: linear-gradient(125deg,#181825,#1e1e2e 35%,#302d52 70%,#1e1e2e);
+    background-size:300% 300%;
+    animation:bgshift 28s ease infinite;
+    position:relative;
+  }
+  @keyframes bgshift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  /* glowing aurora blobs */
+  .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.45;z-index:0;animation:float 20s ease-in-out infinite;}
+  .blob.b1{width:480px;height:480px;background:var(--mauve);top:-120px;left:-80px;}
+  .blob.b2{width:420px;height:420px;background:var(--sapphire);bottom:-140px;right:-60px;animation-delay:-7s;}
+  .blob.b3{width:360px;height:360px;background:var(--pink);top:40%;left:55%;animation-delay:-13s;opacity:.30;}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-30px,25px) scale(.95)}}
+
+  /* ---- Top bar (Waybar) ---- */
+  .bar{
+    position:fixed;top:10px;left:10px;right:10px;height:38px;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 8px;border-radius:14px;
+    background:var(--glass);backdrop-filter:blur(18px) saturate(1.3);
+    -webkit-backdrop-filter:blur(18px) saturate(1.3);
+    border:1px solid var(--border);
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  .bar .group{display:flex;align-items:center;gap:6px;}
+  .pill{display:flex;align-items:center;gap:7px;padding:4px 11px;border-radius:9px;font-size:12.5px;background:rgba(205,214,244,.06);transition:.2s;}
+  .pill:hover{background:rgba(205,214,244,.14);transform:translateY(-1px);cursor:pointer;}
+  .logo{color:var(--blue);font-weight:700;background:rgba(137,180,250,.12);}
+  .ws{gap:3px;}
+  .ws .w{width:26px;height:24px;display:grid;place-items:center;border-radius:7px;font-size:12px;color:var(--overlay);transition:.18s;cursor:pointer;}
+  .ws .w:hover{color:var(--text);background:rgba(205,214,244,.10);}
+  .ws .w.active{color:var(--crust);background:var(--mauve);font-weight:700;box-shadow:0 0 14px rgba(203,166,247,.6);width:34px;}
+  .acc-blue{color:var(--blue)} .acc-green{color:var(--green)} .acc-peach{color:var(--peach)}
+  .acc-mauve{color:var(--mauve)} .acc-red{color:var(--red)} .acc-teal{color:var(--teal)} .acc-yellow{color:var(--yellow)}
+  #clock{font-weight:600;color:var(--lavender);}
+
+  /* ---- Windows ---- */
+  .win{
+    position:fixed;border-radius:14px;overflow:hidden;z-index:10;
+    background:var(--glass-strong);
+    backdrop-filter:blur(22px) saturate(1.25);
+    -webkit-backdrop-filter:blur(22px) saturate(1.25);
+    border:1px solid var(--border);
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+    animation:popin .5s cubic-bezier(.2,.9,.3,1.2) both;
+  }
+  @keyframes popin{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+  .titlebar{height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(17,17,27,.45);border-bottom:1px solid var(--border);font-size:12px;color:var(--subtext);}
+  .dots{display:flex;gap:7px;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.r{background:var(--red)} .dot.y{background:var(--yellow)} .dot.g{background:var(--green)}
+  .win-body{padding:14px 16px;font-size:13px;line-height:1.65;}
+
+  /* terminal / neofetch */
+  .term{top:92px;left:46px;width:560px;}
+  .neofetch{display:flex;gap:18px;}
+  .ascii{color:var(--blue);font-size:12px;line-height:1.25;white-space:pre;text-shadow:0 0 12px rgba(137,180,250,.5);}
+  .info b{color:var(--mauve)} .info .k{color:var(--peach);font-weight:600;}
+  .info{font-size:12.5px;}
+  .swatches{display:flex;gap:5px;margin-top:8px;}
+  .sw{width:15px;height:15px;border-radius:4px;}
+  .prompt{margin-top:12px;color:var(--green);}
+  .prompt .c{color:var(--sapphire)} .cursor{display:inline-block;width:8px;height:15px;background:var(--text);animation:blink 1s steps(1) infinite;vertical-align:-2px;margin-left:2px;}
+  @keyframes blink{50%{opacity:0}}
+
+  /* code editor */
+  .code{top:150px;right:42px;width:430px;}
+  .code .titlebar{background:rgba(17,17,27,.6);}
+  .ln{color:var(--overlay);display:inline-block;width:22px;text-align:right;margin-right:14px;user-select:none;font-size:12px;}
+  .kw{color:var(--mauve)} .fn{color:var(--blue)} .str{color:var(--green)} .num{color:var(--peach)} .cm{color:var(--overlay);font-style:italic} .at{color:var(--yellow)} .var{color:var(--text)}
+  .code .win-body{font-size:12.5px;line-height:1.7;}
+
+  /* music player widget */
+  .music{bottom:96px;left:46px;width:300px;}
+  .music .win-body{display:flex;gap:13px;align-items:center;padding:14px;}
+  .albumart{width:62px;height:62px;border-radius:10px;flex:none;background:linear-gradient(135deg,var(--pink),var(--mauve),var(--sapphire));box-shadow:0 6px 18px rgba(203,166,247,.5);animation:spin 8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .track{font-size:13px;font-weight:600;color:var(--text);}
+  .artist{font-size:11.5px;color:var(--subtext);margin-bottom:8px;}
+  .progress{height:4px;border-radius:3px;background:rgba(205,214,244,.15);overflow:hidden;}
+  .progress i{display:block;height:100%;width:42%;background:linear-gradient(90deg,var(--pink),var(--mauve));border-radius:3px;animation:prog 9s linear infinite;}
+  @keyframes prog{from{width:8%}to{width:96%}}
+  .controls{display:flex;gap:14px;margin-top:9px;font-size:14px;color:var(--subtext);}
+  .controls span:hover{color:var(--text);cursor:pointer}
+
+  /* ---- Dock ---- */
+  .dock{
+    position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:60;
+    display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:18px;
+    background:var(--glass);backdrop-filter:blur(20px) saturate(1.3);
+    -webkit-backdrop-filter:blur(20px) saturate(1.3);
+    border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.45);
+  }
+  .app{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;transition:.18s cubic-bezier(.2,.9,.3,1.4);cursor:pointer;background:rgba(205,214,244,.05);}
+  .app:hover{transform:translateY(-12px) scale(1.18);background:rgba(205,214,244,.16);}
+  .sep{width:1px;height:30px;background:var(--border);margin:0 2px;}
+
+  /* hint */
+  .hint{position:fixed;top:58px;right:14px;z-index:40;font-size:11px;color:var(--overlay);background:var(--glass);padding:5px 11px;border-radius:9px;border:1px solid var(--border);backdrop-filter:blur(10px);}
+  .toggle{position:fixed;top:58px;left:14px;z-index:40;font-size:11px;color:var(--text);background:rgba(203,166,247,.18);padding:6px 13px;border-radius:9px;border:1px solid rgba(203,166,247,.4);backdrop-filter:blur(10px);cursor:pointer;transition:.2s;}
+  .toggle:hover{background:rgba(203,166,247,.32);}
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+  <!-- Top bar -->
+  <div class="bar">
+    <div class="group">
+      <div class="pill logo">❄ NixOS</div>
+      <div class="pill ws">
+        <div class="w active">1</div><div class="w">2</div><div class="w">3</div>
+        <div class="w">4</div><div class="w">5</div>
+      </div>
+    </div>
+    <div class="group">
+      <div class="pill"><span class="acc-peach">󰍛</span> 18%</div>
+      <div class="pill"><span class="acc-green">󰾆</span> 6.2/32 GB</div>
+      <div class="pill"><span class="acc-mauve">󰢮</span> RTX 4080 · 41°C</div>
+      <div class="pill"><span class="acc-teal">󰕾</span> 64%</div>
+      <div class="pill"><span class="acc-yellow"></span> Nix</div>
+      <div class="pill" id="clock">--:--</div>
+    </div>
+  </div>
+
+  <div class="toggle" id="themeBtn">🎨 Switch accent</div>
+  <div class="hint">mockup · hover the dock &amp; windows ✨</div>
+
+  <!-- Terminal / neofetch -->
+  <div class="win term">
+    <div class="titlebar"><div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>&nbsp; kitty — fish</div>
+    <div class="win-body">
+      <div class="neofetch">
+<pre class="ascii">          ::::.    ':::::     ::::'
+          ':::::    ':::::.  ::::'
+            :::::     '::::.:::::
+      .......:::::..... ::::::::
+     ::::::::::::::::::. ::::::    ::::.
+    ::::::::::::::::::::: :::::.  .::::'
+           .....           ::::' :::::'
+          :::::            '::' :::::'
+ ::::::::::::::            '  :::::::::::
+ ::::::::::::: ::::::: '   :::::::::::::::::.
+            ::::::      ::::::::::::::::::::
+             ::::::::::::::::::::::::::::::</pre>
+        <div class="info">
+          <span class="k">bobby</span>@<span class="k">nixstation</span><br>
+          ─────────────────<br>
+          <b>OS</b>: NixOS 25.11 (Xantusia) x86_64<br>
+          <b>Host</b>: Custom Build<br>
+          <b>Kernel</b>: 6.18-zen<br>
+          <b>WM</b>: KDE Plasma 6.5 (Wayland)<br>
+          <b>CPU</b>: AMD Ryzen 7 3800XT (16) @ 4.7GHz<br>
+          <b>GPU</b>: NVIDIA RTX 4080 [nvidia-open]<br>
+          <b>Memory</b>: 6210MiB / 32018MiB<br>
+          <b>Shell</b>: fish 3.7<br>
+          <b>Theme</b>: Catppuccin-Mocha-Mauve<br>
+          <div class="swatches">
+            <span class="sw" style="background:var(--red)"></span>
+            <span class="sw" style="background:var(--peach)"></span>
+            <span class="sw" style="background:var(--yellow)"></span>
+            <span class="sw" style="background:var(--green)"></span>
+            <span class="sw" style="background:var(--teal)"></span>
+            <span class="sw" style="background:var(--blue)"></span>
+            <span class="sw" style="background:var(--mauve)"></span>
+            <span class="sw" style="background:var(--pink)"></span>
+          </div>
+        </div>
+      </div>
+      <div class="prompt">❯ <span class="c">sudo</span> nixos-rebuild switch --flake .#nixstation<span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- Code editor -->
+  <div class="win code">
+    <div class="titlebar"><div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>&nbsp; configuration.nix — neovim</div>
+    <div class="win-body">
+<div><span class="ln">14</span><span class="cm"># your whole machine, as code ❄</span></div>
+<div><span class="ln">15</span><span class="kw">programs</span>.<span class="fn">steam</span>.<span class="var">enable</span> = <span class="at">true</span>;</div>
+<div><span class="ln">16</span><span class="kw">programs</span>.<span class="fn">gamemode</span>.<span class="var">enable</span> = <span class="at">true</span>;</div>
+<div><span class="ln">17</span></div>
+<div><span class="ln">18</span><span class="kw">hardware</span>.<span class="fn">nvidia</span> = {</div>
+<div><span class="ln">19</span>&nbsp;&nbsp;<span class="var">open</span> = <span class="at">true</span>;<span class="cm">  # nvidia-open for Ada</span></div>
+<div><span class="ln">20</span>&nbsp;&nbsp;<span class="var">modesetting</span>.<span class="var">enable</span> = <span class="at">true</span>;</div>
+<div><span class="ln">21</span>&nbsp;&nbsp;<span class="var">package</span> = <span class="num">latest</span>;</div>
+<div><span class="ln">22</span>};</div>
+<div><span class="ln">23</span></div>
+<div><span class="ln">24</span><span class="kw">services</span>.<span class="fn">desktopManager</span>.<span class="var">plasma6</span>.<span class="var">enable</span> = <span class="at">true</span>;</div>
+<div><span class="ln">25</span><span class="kw">programs</span>.<span class="fn">hyprland</span>.<span class="var">enable</span> = <span class="at">true</span>;<span class="cm"> # both!</span></div>
+    </div>
+  </div>
+
+  <!-- Music widget -->
+  <div class="win music">
+    <div class="win-body">
+      <div class="albumart"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="track">Midnight City</div>
+        <div class="artist">M83</div>
+        <div class="progress"><i></i></div>
+        <div class="controls"><span>󰒮</span><span>󰏤</span><span>󰒭</span><span style="margin-left:auto;color:var(--mauve)">󰋜</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dock -->
+  <div class="dock">
+    <div class="app" title="Files">📁</div>
+    <div class="app" title="Firefox">🌐</div>
+    <div class="app" title="Terminal">🖥️</div>
+    <div class="app" title="VS Code">📝</div>
+    <div class="sep"></div>
+    <div class="app" title="Steam">🎮</div>
+    <div class="app" title="Discord">💬</div>
+    <div class="app" title="Spotify">🎵</div>
+    <div class="sep"></div>
+    <div class="app" title="Settings">⚙️</div>
+  </div>
+
+<script>
+  // live clock
+  function tick(){
+    const d=new Date();
+    const h=String(d.getHours()).padStart(2,'0');
+    const m=String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('clock').textContent=`󰥔 ${h}:${m}`;
+  }
+  tick(); setInterval(tick,1000);
+
+  // accent theme switcher — cycles popular Catppuccin accents
+  const accents=[
+    {name:'Mauve', c:'#cba6f7'},
+    {name:'Blue',  c:'#89b4fa'},
+    {name:'Teal',  c:'#94e2d5'},
+    {name:'Pink',  c:'#f5c2e7'},
+    {name:'Peach', c:'#fab387'},
+    {name:'Green', c:'#a6e3a1'},
+  ];
+  let i=0;
+  document.getElementById('themeBtn').addEventListener('click',()=>{
+    i=(i+1)%accents.length;
+    const a=accents[i];
+    document.documentElement.style.setProperty('--mauve',a.c);
+    document.getElementById('themeBtn').textContent='🎨 '+a.name;
+  });
+</script>
+</body>
+</html>
