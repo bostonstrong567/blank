@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Everforest — NixOS rice</title>
+<style>
+:root{--bg:#2d353b;--bg1:#343f44;--bg2:#3d484d;--fg:#d3c6aa;--dim:#859289;--red:#e67e80;--orange:#e69875;--yellow:#dbbc7f;--green:#a7c080;--aqua:#83c092;--blue:#7fbbb3;--purple:#d699b6;--glass:rgba(45,53,59,.6);--bd:rgba(211,198,170,.10);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:"Inter","SF Pro Display",system-ui,sans-serif;color:var(--fg)}
+body{background:linear-gradient(165deg,#2d353b,#343f44 45%,#3a4a3e 78%,#2d353b);position:relative}
+.glow{position:fixed;border-radius:50%;filter:blur(120px);opacity:.32;z-index:0}.g1{width:480px;height:480px;background:var(--green);top:-130px;right:5%}.g2{width:400px;height:400px;background:var(--aqua);bottom:-140px;left:-40px;opacity:.25}
+/* soft hills wallpaper */
+.hill{position:fixed;bottom:0;left:0;right:0;z-index:1;opacity:.5}
+.hill svg{display:block;width:100%}
+/* top greeting bar */
+.top{position:fixed;top:26px;left:34px;right:34px;z-index:40;display:flex;justify-content:space-between;align-items:flex-start}
+.greet h1{font-size:30px;font-weight:300}.greet h1 b{font-weight:600;color:var(--green)}.greet p{color:var(--dim);font-size:14px;margin-top:3px}
+.syschips{display:flex;gap:8px}.chip{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:14px;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--bd);font-size:12.5px;box-shadow:0 8px 26px rgba(0,0,0,.3)}.chip b{color:var(--aqua)}
+/* weather card center-left */
+.win{position:fixed;border-radius:18px;overflow:hidden;z-index:10;background:var(--glass);backdrop-filter:blur(22px) saturate(1.2);border:1px solid var(--bd);box-shadow:0 18px 50px rgba(0,0,0,.4);animation:fade .8s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.wx{top:120px;left:34px;width:300px;padding:20px 22px}
+.wx .row1{display:flex;align-items:center;gap:16px}.wxi{font-size:56px}.wxt{font-size:44px;font-weight:200}.wxl{color:var(--dim);font-size:13px}.wxd{color:var(--orange);font-weight:600;font-size:13px}
+.fc{display:flex;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)}
+.fc .day{text-align:center;font-size:11px;color:var(--dim)}.fc .day .e{font-size:22px;display:block;margin:5px 0}.fc .day b{color:var(--fg);font-size:12px}
+/* terminal cozy */
+.term{top:120px;right:34px;width:430px}
+.tb{height:32px;display:flex;align-items:center;gap:8px;padding:0 13px;background:rgba(45,53,59,.5);border-bottom:1px solid var(--bd);font-size:11.5px;color:var(--dim)}
+.dots{display:flex;gap:6px}.d{width:11px;height:11px;border-radius:50%}.dr{background:var(--red)}.dy{background:var(--yellow)}.dg{background:var(--green)}
+.tbody{padding:15px 17px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.65}
+.nf{display:flex;gap:16px}.asc{color:var(--green);font-size:11px;line-height:1.15;white-space:pre}
+.info b{color:var(--purple)}.info .k{color:var(--aqua);font-weight:700}
+.pr{margin-top:10px;color:var(--green)}.pr .c{color:var(--blue)}.cur{display:inline-block;width:7px;height:13px;background:var(--fg);animation:bl 1s steps(1) infinite;vertical-align:-2px}@keyframes bl{50%{opacity:0}}
+/* now playing bottom-left */
+.np{bottom:34px;left:34px;width:310px;padding:15px;display:flex;gap:13px;align-items:center}
+.art{width:54px;height:54px;border-radius:12px;flex:none;background:linear-gradient(135deg,var(--green),var(--aqua),var(--blue));box-shadow:0 6px 16px rgba(167,192,128,.4)}
+.tr{font-size:13px;font-weight:600}.ar{font-size:11px;color:var(--dim);margin-bottom:7px}.pg{height:4px;border-radius:3px;background:rgba(211,198,170,.15);overflow:hidden}.pg i{display:block;height:100%;width:38%;background:linear-gradient(90deg,var(--green),var(--aqua))}
+/* dock */
+.dock{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:12px;padding:10px 16px;border-radius:20px;background:var(--glass);backdrop-filter:blur(22px);border:1px solid var(--bd);box-shadow:0 14px 44px rgba(0,0,0,.35)}
+.app{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;transition:.2s cubic-bezier(.2,.9,.3,1.4);cursor:pointer}.app:hover{transform:translateY(-13px) scale(1.18)}
+.tag{position:fixed;bottom:34px;right:34px;z-index:40;font-size:11px;color:var(--dim)}
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<div class="hill"><svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="#3a4a3e" d="M0,224L80,202.7C160,181,320,139,480,149.3C640,160,800,224,960,234.7C1120,245,1280,203,1360,181.3L1440,160L1440,320L0,320Z"/><path fill="#33403a" opacity="0.7" d="M0,288L120,266.7C240,245,480,203,720,208C960,213,1200,267,1320,293.3L1440,320L0,320Z"/></svg></div>
+<div class="top"><div class="greet"><h1>good evening, <b>bobby</b> 🌲</h1><p>your forest is calm · generation #47 active</p></div>
+<div class="syschips"><div class="chip">󰢮 <b>RTX 4080 · 38°</b></div><div class="chip">󰾆 <b>5.8/32G</b></div><div class="chip">❄ <b>NixOS</b></div></div></div>
+<div class="win wx"><div class="row1"><div class="wxi">🌤️</div><div><div class="wxt">72°</div><div class="wxl">Boston · feels 70°</div><div class="wxd">Clear skies</div></div></div>
+<div class="fc"><div class="day">Wed<span class="e">☀️</span><b>78°</b></div><div class="day">Thu<span class="e">⛅</span><b>74°</b></div><div class="day">Fri<span class="e">🌧️</span><b>66°</b></div><div class="day">Sat<span class="e">☀️</span><b>80°</b></div></div></div>
+<div class="win term"><div class="tb"><div class="dots"><span class="d dr"></span><span class="d dy"></span><span class="d dg"></span></div>&nbsp;foot — fish</div>
+<div class="tbody"><div class="nf"><pre class="asc">    🌲
+   🌲🌲
+  🌲🌲🌲
+ 🌲🌲🌲🌲
+    ▓▓
+ everforest</pre>
+<div class="info"><span class="k">bobby@nixstation</span><br>──────────<br><b>OS</b> NixOS 25.11<br><b>WM</b> Plasma 6 Wayland<br><b>CPU</b> Ryzen 7 3800XT<br><b>GPU</b> RTX 4080<br><b>RAM</b> 5.8/32G</div></div>
+<div class="pr">❯ <span class="c">nix</span> flake check ✓<span class="cur"></span></div></div></div>
+<div class="win np"><div class="art"></div><div style="flex:1;min-width:0"><div class="tr">Saturn</div><div class="ar">Sleeping at Last</div><div class="pg"><i></i></div></div></div>
+<div class="dock"><div class="app">📁</div><div class="app">🌐</div><div class="app">🖥️</div><div class="app">📝</div><div class="app">🎮</div><div class="app">🎵</div><div class="app">⚙️</div></div>
+<div class="tag">Everforest · cozy nature + weather</div>
+<script>function t(){const d=new Date();}t();</script>
+</body></html>

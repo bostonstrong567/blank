@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NixOS Rice Gallery</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;color:#cdd6f4;background:#0e0e16}
+body{background:radial-gradient(1200px 800px at 50% -10%,#1e1e2e,#0e0e16 70%);padding:48px 24px 64px}
+.hd{text-align:center;max-width:760px;margin:0 auto 44px}
+.hd h1{font-size:38px;font-weight:800;background:linear-gradient(120deg,#89b4fa,#cba6f7,#f5c2e7);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:1px}
+.hd p{color:#a6adc8;margin-top:12px;font-size:14px;line-height:1.7}
+.hd .note{margin-top:14px;font-size:12px;color:#6c7086}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px;max-width:1180px;margin:0 auto}
+.card{display:block;text-decoration:none;color:inherit;border-radius:16px;overflow:hidden;background:rgba(30,30,46,.6);border:1px solid rgba(205,214,244,.1);box-shadow:0 12px 36px rgba(0,0,0,.4);transition:.22s cubic-bezier(.2,.9,.3,1.2)}
+.card:hover{transform:translateY(-6px);box-shadow:0 22px 54px rgba(0,0,0,.55);border-color:rgba(205,214,244,.25)}
+.swatch{height:120px;position:relative;display:flex;align-items:flex-end;padding:12px 14px}
+.swatch .dots{position:absolute;top:12px;left:14px;display:flex;gap:6px}.swatch .dots i{width:11px;height:11px;border-radius:50%;opacity:.85}
+.swatch .name{font-size:19px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.meta{padding:14px 16px}
+.meta .layout{font-size:12px;color:#bac2de;margin-bottom:8px}
+.meta .pal{display:flex;gap:6px}.meta .pal i{width:18px;height:18px;border-radius:5px}
+.meta .go{margin-top:12px;font-size:12px;color:#89b4fa;display:flex;align-items:center;gap:6px}
+.foot{text-align:center;margin-top:48px;color:#6c7086;font-size:12px;line-height:1.8}
+.foot b{color:#a6e3a1}
+</style></head><body>
+<div class="hd">
+  <h1>❄ NixOS Rice Gallery</h1>
+  <p>8 desktop concepts for your build — RTX 4080 · Ryzen 7 3800XT · 32 GB. Every one is mouse-friendly, modern, and Wayland-ready. Click any card to open the full interactive preview.</p>
+  <p class="note">⚠ These are browser mockups to show the <i>look &amp; palette</i> — the real desktop has live apps, GPU animations &amp; tiling. No workspace switcher included, as requested.</p>
+</div>
+<div class="grid">
+
+  <a class="card" href="../nixos-desktop-preview.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#1e1e2e,#302d52)"><div class="dots"><i style="background:#f38ba8"></i><i style="background:#f9e2af"></i><i style="background:#a6e3a1"></i></div><div class="name" style="color:#cba6f7">Catppuccin Mocha</div></div>
+    <div class="meta"><div class="layout">◇ Floating windows · top Waybar · dock · accent switcher</div><div class="pal"><i style="background:#f38ba8"></i><i style="background:#fab387"></i><i style="background:#a6e3a1"></i><i style="background:#89b4fa"></i><i style="background:#cba6f7"></i><i style="background:#f5c2e7"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="01-tokyo-night.html">
+    <div class="swatch" style="background:radial-gradient(400px 200px at 70% 0,#24283b,#1a1b26)"><div class="dots"><i style="background:#f7768e"></i><i style="background:#ff9e64"></i><i style="background:#9ece6a"></i></div><div class="name" style="color:#7aa2f7">Tokyo Night</div></div>
+    <div class="meta"><div class="layout">◇ Vertical dock · floating dev windows · starfield</div><div class="pal"><i style="background:#f7768e"></i><i style="background:#ff9e64"></i><i style="background:#9ece6a"></i><i style="background:#7dcfff"></i><i style="background:#7aa2f7"></i><i style="background:#bb9af7"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="02-gruvbox.html">
+    <div class="swatch" style="background:linear-gradient(160deg,#282828,#3c2e26)"><div class="dots"><i style="background:#fb4934"></i><i style="background:#fabd2f"></i><i style="background:#b8bb26"></i></div><div class="name" style="color:#fe8019">Gruvbox</div></div>
+    <div class="meta"><div class="layout">◇ Traditional bottom taskbar · desktop icons · cozy retro</div><div class="pal"><i style="background:#fb4934"></i><i style="background:#fe8019"></i><i style="background:#fabd2f"></i><i style="background:#b8bb26"></i><i style="background:#8ec07c"></i><i style="background:#d3869b"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="03-rose-pine.html">
+    <div class="swatch" style="background:radial-gradient(400px 200px at 30% 0,#26233a,#191724)"><div class="dots"><i style="background:#eb6f92"></i><i style="background:#f6c177"></i><i style="background:#9ccfd8"></i></div><div class="name" style="color:#ebbcba">Rosé Pine</div></div>
+    <div class="meta"><div class="layout">◇ Minimal zen · giant clock · negative space · fade-in dock</div><div class="pal"><i style="background:#eb6f92"></i><i style="background:#f6c177"></i><i style="background:#ebbcba"></i><i style="background:#9ccfd8"></i><i style="background:#c4a7e7"></i><i style="background:#31748f"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="04-nord.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#2e3440,#3b4252)"><div class="dots"><i style="background:#bf616a"></i><i style="background:#ebcb8b"></i><i style="background:#a3be8c"></i></div><div class="name" style="color:#88c0d0">Nord</div></div>
+    <div class="meta"><div class="layout">◇ Tiling-WM grid (auto-arranged) · btop · arctic minimal</div><div class="pal"><i style="background:#bf616a"></i><i style="background:#d08770"></i><i style="background:#ebcb8b"></i><i style="background:#a3be8c"></i><i style="background:#88c0d0"></i><i style="background:#b48ead"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="05-synthwave.html">
+    <div class="swatch" style="background:linear-gradient(180deg,#0d0221,#5a0a4d 70%,#ff2e97)"><div class="dots"><i style="background:#ff2e97"></i><i style="background:#ffe600"></i><i style="background:#00f0ff"></i></div><div class="name" style="color:#00f0ff">Synthwave</div></div>
+    <div class="meta"><div class="layout">◇ Neon grid horizon · scanlines · HUD monitors · max future</div><div class="pal"><i style="background:#ff2e97"></i><i style="background:#ff6c11"></i><i style="background:#ffe600"></i><i style="background:#00f0ff"></i><i style="background:#b026ff"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="06-catppuccin-latte.html">
+    <div class="swatch" style="background:linear-gradient(135deg,#eff1f5,#dce4f0)"><div class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div><div class="name" style="color:#1e66f5">Catppuccin Latte</div></div>
+    <div class="meta"><div class="layout">◇ Light mode · macOS menubar + dock · calendar/weather/todo</div><div class="pal"><i style="background:#d20f39"></i><i style="background:#fe640b"></i><i style="background:#40a02b"></i><i style="background:#1e66f5"></i><i style="background:#8839ef"></i><i style="background:#ea76cb"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="07-dracula.html">
+    <div class="swatch" style="background:radial-gradient(400px 200px at 25% 0,#343746,#282a36)"><div class="dots"><i style="background:#ff5555"></i><i style="background:#f1fa8c"></i><i style="background:#50fa7b"></i></div><div class="name" style="color:#bd93f9">Dracula</div></div>
+    <div class="meta"><div class="layout">◇ Conky widget column · CPU/RAM/GPU rings · big clock</div><div class="pal"><i style="background:#ff5555"></i><i style="background:#ffb86c"></i><i style="background:#f1fa8c"></i><i style="background:#50fa7b"></i><i style="background:#8be9fd"></i><i style="background:#bd93f9"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+  <a class="card" href="08-everforest.html">
+    <div class="swatch" style="background:linear-gradient(165deg,#2d353b,#3a4a3e)"><div class="dots"><i style="background:#e67e80"></i><i style="background:#dbbc7f"></i><i style="background:#a7c080"></i></div><div class="name" style="color:#a7c080">Everforest</div></div>
+    <div class="meta"><div class="layout">◇ Cozy nature · soft hills · weather forecast · warm calm</div><div class="pal"><i style="background:#e67e80"></i><i style="background:#e69875"></i><i style="background:#dbbc7f"></i><i style="background:#a7c080"></i><i style="background:#83c092"></i><i style="background:#d699b6"></i></div><div class="go">open preview →</div></div>
+  </a>
+
+</div>
+<div class="foot">Pick the vibe you love and I'll build the real thing → <b>flake.nix + Home Manager</b> config that boots straight into it.<br>KDE Plasma 6 (mouse-native) or Hyprland · nvidia-open tuned for your 4080 · Steam/Proton/GameMode included.</div>
+</body></html>

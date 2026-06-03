@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tokyo Night — NixOS rice</title>
+<style>
+:root{--bg:#1a1b26;--bg2:#16161e;--fg:#c0caf5;--dim:#565f89;--blue:#7aa2f7;--cyan:#7dcfff;--purple:#bb9af7;--green:#9ece6a;--orange:#ff9e64;--red:#f7768e;--magenta:#bb9af7;--teal:#73daca;--glass:rgba(26,27,38,.6);--bd:rgba(192,202,245,.09);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;color:var(--fg);}
+body{background:radial-gradient(1200px 700px at 70% 10%,#24283b,#1a1b26 60%,#16161e);position:relative;}
+.stars{position:fixed;inset:0;z-index:0;background-image:radial-gradient(1px 1px at 20% 30%,#7aa2f7 50%,transparent),radial-gradient(1px 1px at 70% 60%,#bb9af7 50%,transparent),radial-gradient(1px 1px at 40% 80%,#7dcfff 50%,transparent),radial-gradient(1px 1px at 85% 20%,#fff 50%,transparent),radial-gradient(1px 1px at 15% 65%,#fff 50%,transparent);opacity:.5;}
+.glow{position:fixed;border-radius:50%;filter:blur(100px);opacity:.4;z-index:0;}
+.g1{width:420px;height:420px;background:var(--purple);top:-100px;right:10%;}
+.g2{width:360px;height:360px;background:var(--blue);bottom:-120px;left:5%;}
+/* vertical dock */
+.vdock{position:fixed;top:50%;left:14px;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:10px;padding:12px 9px;border-radius:18px;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--bd);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.vdock .a{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:21px;background:rgba(192,202,245,.05);transition:.18s cubic-bezier(.2,.9,.3,1.4);cursor:pointer;}
+.vdock .a:hover{transform:translateX(8px) scale(1.15);background:rgba(122,162,247,.22);box-shadow:0 0 18px rgba(122,162,247,.5);}
+.vdock .sep{height:1px;background:var(--bd);margin:3px 6px;}
+/* top bar */
+.bar{position:fixed;top:12px;right:14px;left:96px;height:36px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:13px;background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--bd);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.bar .l{color:var(--blue);font-weight:700;font-size:13px;}
+.bar .r{display:flex;gap:16px;font-size:12.5px;}
+.bar .r span b{color:var(--purple);}
+#clk{color:var(--cyan);font-weight:600;}
+/* windows */
+.win{position:fixed;border-radius:13px;overflow:hidden;z-index:10;background:rgba(22,22,30,.82);backdrop-filter:blur(20px);border:1px solid var(--bd);box-shadow:0 26px 64px rgba(0,0,0,.55);animation:pop .5s cubic-bezier(.2,.9,.3,1.2) both;}
+@keyframes pop{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.tb{height:32px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(16,16,22,.6);border-bottom:1px solid var(--bd);font-size:11.5px;color:var(--dim);}
+.dots{display:flex;gap:6px}.d{width:11px;height:11px;border-radius:50%}.dr{background:var(--red)}.dy{background:var(--orange)}.dg{background:var(--green)}
+.body{padding:14px 16px;font-size:12.5px;line-height:1.65;}
+.term{top:84px;left:130px;width:540px;}
+.nf{display:flex;gap:18px;}
+.asc{color:var(--blue);font-size:11px;line-height:1.2;white-space:pre;text-shadow:0 0 10px rgba(122,162,247,.6);}
+.info b{color:var(--purple)}.info .k{color:var(--cyan);font-weight:700}
+.sw{display:flex;gap:5px;margin-top:7px}.sw i{width:14px;height:14px;border-radius:4px;display:block}
+.pr{margin-top:11px;color:var(--green)}.pr .c{color:var(--cyan)}.cur{display:inline-block;width:7px;height:14px;background:var(--fg);animation:bl 1s steps(1) infinite;vertical-align:-2px}
+@keyframes bl{50%{opacity:0}}
+.code{top:140px;right:40px;width:420px;}
+.ln{color:var(--dim);width:20px;display:inline-block;text-align:right;margin-right:13px}
+.kw{color:var(--purple)}.fn{color:var(--blue)}.st{color:var(--green)}.nm{color:var(--orange)}.cm{color:var(--dim);font-style:italic}.at{color:var(--teal)}
+.music{bottom:30px;right:40px;width:290px}.music .body{display:flex;gap:12px;align-items:center}
+.art{width:58px;height:58px;border-radius:10px;flex:none;background:linear-gradient(135deg,var(--purple),var(--blue),var(--cyan));animation:spin 9s linear infinite;box-shadow:0 6px 18px rgba(122,162,247,.5)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tr{font-size:13px;font-weight:600}.ar{font-size:11px;color:var(--dim);margin-bottom:7px}
+.pg{height:4px;border-radius:3px;background:rgba(192,202,245,.14);overflow:hidden}.pg i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));animation:prog 10s linear infinite}
+@keyframes prog{from{width:10%}to{width:95%}}
+.tag{position:fixed;bottom:14px;left:14px;z-index:40;font-size:11px;color:var(--dim);background:var(--glass);padding:5px 11px;border-radius:9px;border:1px solid var(--bd);backdrop-filter:blur(10px)}
+</style></head><body>
+<div class="stars"></div><div class="glow g1"></div><div class="glow g2"></div>
+<div class="vdock"><div class="a">📁</div><div class="a">🌐</div><div class="a">🖥️</div><div class="a">📝</div><div class="sep"></div><div class="a">🎮</div><div class="a">💬</div><div class="a">🎵</div><div class="sep"></div><div class="a">⚙️</div></div>
+<div class="bar"><div class="l">❄ Tokyo Night</div><div class="r"><span>󰍛 <b>14%</b></span><span>󰾆 <b>5.8/32G</b></span><span>󰢮 <b>RTX 4080 39°</b></span><span>󰕾 60%</span><span id="clk">--:--</span></div></div>
+<div class="win term"><div class="tb"><div class="dots"><span class="d dr"></span><span class="d dy"></span><span class="d dg"></span></div>&nbsp;kitty — fish</div>
+<div class="body"><div class="nf"><pre class="asc">       ▟████▙
+     ▟████████▙
+   ▟████  ████████▙
+ ▟████      ████████▙
+▜████        ████████▛
+  ▜████    ████████▛
+    ▜████████████▛
+      ▜████████▛
+        ▜████▛</pre>
+<div class="info"><span class="k">bobby</span>@<span class="k">nixstation</span><br>───────────────<br><b>OS</b> NixOS 25.11 x86_64<br><b>Kernel</b> 6.18-zen<br><b>DE</b> KDE Plasma 6.5 (Wayland)<br><b>CPU</b> Ryzen 7 3800XT @4.7GHz<br><b>GPU</b> RTX 4080 [nvidia-open]<br><b>RAM</b> 5.8/32 GiB<br><b>Theme</b> Tokyo-Night-Storm<br>
+<div class="sw"><i style="background:var(--red)"></i><i style="background:var(--orange)"></i><i style="background:var(--green)"></i><i style="background:var(--teal)"></i><i style="background:var(--blue)"></i><i style="background:var(--purple)"></i><i style="background:var(--cyan)"></i></div></div></div>
+<div class="pr">❯ <span class="c">nix</span> flake update<span class="cur"></span></div></div></div>
+<div class="win code"><div class="tb"><div class="dots"><span class="d dr"></span><span class="d dy"></span><span class="d dg"></span></div>&nbsp;flake.nix — neovim</div>
+<div class="body"><div><span class="ln">8</span><span class="cm"># one file = the whole machine</span></div><div><span class="ln">9</span><span class="kw">programs</span>.<span class="fn">steam</span>.<span class="at">enable</span> = <span class="nm">true</span>;</div><div><span class="ln">10</span><span class="kw">hardware</span>.<span class="fn">nvidia</span>.<span class="at">open</span> = <span class="nm">true</span>;</div><div><span class="ln">11</span><span class="kw">services</span>.<span class="fn">plasma6</span>.<span class="at">enable</span> = <span class="nm">true</span>;</div><div><span class="ln">12</span><span class="kw">programs</span>.<span class="fn">gamemode</span>.<span class="at">enable</span> = <span class="nm">true</span>;</div></div></div>
+<div class="win music"><div class="body"><div class="art"></div><div style="flex:1;min-width:0"><div class="tr">Resonance</div><div class="ar">HOME</div><div class="pg"><i></i></div></div></div></div>
+<div class="tag">Tokyo Night · floating + vertical dock</div>
+<script>function t(){const d=new Date();document.getElementById('clk').textContent='󰥔 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}t();setInterval(t,1000);</script>
+</body></html>

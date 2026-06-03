@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Synthwave — NixOS rice</title>
+<style>
+:root{--bg:#0d0221;--pink:#ff2e97;--cyan:#00f0ff;--purple:#b026ff;--yellow:#ffe600;--orange:#ff6c11;--fg:#fdf6ff;--dim:#a78bba;--glass:rgba(20,5,46,.55);--bd:rgba(255,46,151,.35);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:"Orbitron","JetBrains Mono",ui-monospace,monospace;color:var(--fg)}
+body{background:linear-gradient(180deg,#0d0221 0%,#250b46 45%,#5a0a4d 62%,#ff2e97 100%);position:relative}
+/* sun */
+.sun{position:fixed;top:18%;left:50%;transform:translateX(-50%);width:300px;height:300px;border-radius:50%;background:linear-gradient(180deg,#ffe600,#ff6c11 50%,#ff2e97);z-index:1;box-shadow:0 0 120px rgba(255,108,17,.7)}
+.sun::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(180deg,transparent 0 18px,#0d0221 18px 24px);mask:linear-gradient(180deg,transparent 55%,#000 55%);-webkit-mask:linear-gradient(180deg,transparent 55%,#000 55%)}
+/* grid floor */
+.floor{position:fixed;bottom:0;left:0;right:0;height:42%;z-index:1;perspective:340px;overflow:hidden}
+.floor::before{content:"";position:absolute;inset:-50% -50% 0;background-image:linear-gradient(var(--cyan) 2px,transparent 2px),linear-gradient(90deg,var(--cyan) 2px,transparent 2px);background-size:54px 54px;transform:rotateX(72deg);transform-origin:bottom;opacity:.6;animation:grid 1.2s linear infinite}
+@keyframes grid{to{background-position:0 54px}}
+.floor::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0d0221 0%,transparent 40%)}
+/* scanlines */
+.scan{position:fixed;inset:0;z-index:80;pointer-events:none;background:repeating-linear-gradient(180deg,transparent 0 2px,rgba(0,0,0,.18) 2px 3px);opacity:.5}
+.vig{position:fixed;inset:0;z-index:79;pointer-events:none;box-shadow:inset 0 0 200px rgba(13,2,33,.9)}
+/* title HUD */
+.title{position:fixed;top:34px;left:0;right:0;z-index:40;text-align:center}
+.title h1{font-size:46px;font-weight:900;letter-spacing:8px;background:linear-gradient(180deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 26px rgba(255,46,151,.7);animation:glitch 4s infinite}
+@keyframes glitch{0%,92%,100%{transform:none}93%{transform:translate(-3px,1px)}94%{transform:translate(3px,-1px)}95%{transform:none}}
+.title .sub{color:var(--cyan);font-size:13px;letter-spacing:6px;margin-top:4px;text-shadow:0 0 12px var(--cyan)}
+/* HUD corner monitors */
+.hud{position:fixed;z-index:50;padding:14px 16px;border-radius:4px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--bd);box-shadow:0 0 24px rgba(255,46,151,.25),inset 0 0 24px rgba(176,38,255,.12);font-family:"JetBrains Mono",monospace}
+.hud .h{font-size:11px;letter-spacing:3px;color:var(--cyan);margin-bottom:10px;text-shadow:0 0 8px var(--cyan)}
+.hl{font-size:11px;margin-bottom:9px}.hl .lb{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:4px}.hl .lb b{color:var(--pink)}
+.barr{height:6px;background:rgba(255,255,255,.1);border-radius:0;overflow:hidden}.barr i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));box-shadow:0 0 10px var(--pink)}
+.left{top:120px;left:30px;width:230px}
+.right{top:120px;right:30px;width:230px}
+.right .row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px;color:var(--dim)}.right .row b{color:var(--yellow)}
+/* terminal */
+.term{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);width:540px;z-index:50;border-radius:4px;overflow:hidden;background:rgba(13,2,33,.82);backdrop-filter:blur(14px);border:1px solid var(--bd);box-shadow:0 0 34px rgba(255,46,151,.35)}
+.tb{height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;background:linear-gradient(90deg,rgba(255,46,151,.2),rgba(0,240,255,.12));border-bottom:1px solid var(--bd);font-size:11px;letter-spacing:2px;color:var(--cyan)}
+.dots{display:flex;gap:6px}.d{width:10px;height:10px;border-radius:50%}.dr{background:var(--pink)}.dy{background:var(--yellow)}.dg{background:var(--cyan)}
+.body{padding:14px 16px;font-size:12.5px;line-height:1.6;font-family:"JetBrains Mono",monospace}
+.body .g{color:var(--cyan)}.body .p{color:var(--pink)}.body .y{color:var(--yellow)}.body b{color:var(--purple)}
+.cur{display:inline-block;width:8px;height:14px;background:var(--cyan);animation:bl 1s steps(1) infinite;vertical-align:-2px;box-shadow:0 0 8px var(--cyan)}@keyframes bl{50%{opacity:0}}
+.clk{position:fixed;top:40px;right:34px;z-index:60;font-family:"JetBrains Mono",monospace;font-size:26px;color:var(--cyan);text-shadow:0 0 14px var(--cyan);letter-spacing:2px;display:none}
+.tag{position:fixed;bottom:12px;left:16px;z-index:60;font-size:10px;letter-spacing:2px;color:var(--cyan);font-family:"JetBrains Mono",monospace}
+</style></head><body>
+<div class="sun"></div><div class="floor"></div>
+<div class="title"><h1>N E O N · N I X</h1><div class="sub">▚ IS THIS THE FUTURE? ▞</div></div>
+<div class="hud left"><div class="h">▰ SYSTEM ▰</div>
+<div class="hl"><div class="lb"><span>CPU 3800XT</span><b id="c1">17%</b></div><div class="barr"><i id="b1" style="width:17%"></i></div></div>
+<div class="hl"><div class="lb"><span>GPU RTX 4080</span><b id="c2">42%</b></div><div class="barr"><i id="b2" style="width:42%"></i></div></div>
+<div class="hl"><div class="lb"><span>MEM</span><b>5.8/32G</b></div><div class="barr"><i style="width:18%"></i></div></div>
+<div class="hl"><div class="lb"><span>VRAM</span><b>6.1/16G</b></div><div class="barr"><i style="width:38%"></i></div></div></div>
+<div class="hud right"><div class="h">▰ STATUS ▰</div>
+<div class="row"><span>OS</span><b>NixOS 25.11</b></div><div class="row"><span>KERNEL</span><b>6.18-zen</b></div><div class="row"><span>WM</span><b>Hyprland</b></div><div class="row"><span>DRIVER</span><b>nvidia-open</b></div><div class="row"><span>GEN</span><b>#47</b></div><div class="row"><span>NET</span><b>▲ 12 ▼ 88 Mb/s</b></div><div class="row"><span>FPS</span><b style="color:var(--cyan)">237</b></div></div>
+<div class="win term"><div class="tb"><div class="dots"><span class="d dr"></span><span class="d dy"></span><span class="d dg"></span></div>&nbsp;NETRUNNER://nixstation</div>
+<div class="body"><span class="g">root@nixstation</span>:<span class="p">~</span>$ <span class="y">neofetch</span> --gpu<br><b>►</b> RTX 4080 detected · <span class="g">nvidia-open</span> · Vulkan 1.4 ✓<br><b>►</b> explicit-sync <span class="g">ENABLED</span> · Wayland <span class="g">OK</span><br><span class="g">root@nixstation</span>:<span class="p">~</span>$ <span class="y">steam</span> -gamemode cyberpunk2077<br><b>►</b> launching... Proton 9.0 · <span class="g">237 fps</span> @ 1440p RT-Ultra<br><span class="g">root@nixstation</span>:<span class="p">~</span>$ <span class="cur"></span></div></div>
+<div class="scan"></div><div class="vig"></div>
+<div class="tag">SYNTHWAVE · neon HUD · scanlines</div>
+<script>function r(a,b){return Math.floor(a+Math.random()*(b-a))}function tk(){const x=r(8,28),y=r(30,70);document.getElementById('c1').textContent=x+'%';document.getElementById('b1').style.width=x+'%';document.getElementById('c2').textContent=y+'%';document.getElementById('b2').style.width=y+'%'}setInterval(tk,1400);</script>
+</body></html>

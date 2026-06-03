@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dracula — NixOS rice</title>
+<style>
+:root{--bg:#282a36;--cur:#44475a;--fg:#f8f8f2;--dim:#6272a4;--cyan:#8be9fd;--green:#50fa7b;--orange:#ffb86c;--pink:#ff79c6;--purple:#bd93f9;--red:#ff5555;--yellow:#f1fa8c;--glass:rgba(40,42,54,.62);--bd:rgba(248,248,242,.09);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--fg)}
+body{background:radial-gradient(1100px 700px at 25% 15%,#343746,#282a36 60%,#21222c);position:relative}
+.glow{position:fixed;border-radius:50%;filter:blur(110px);opacity:.35;z-index:0}.g1{width:440px;height:440px;background:var(--purple);top:-110px;left:-40px}.g2{width:380px;height:380px;background:var(--pink);bottom:-120px;left:30%;opacity:.25}
+/* right conky widget column */
+.conky{position:fixed;top:24px;right:24px;bottom:24px;width:280px;z-index:30;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--bd);border-radius:16px;padding:16px 18px;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.bigtime{text-align:center}.bigtime .t{font-size:52px;font-weight:200;letter-spacing:2px;background:linear-gradient(120deg,var(--pink),var(--purple),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.bigtime .d{color:var(--dim);font-size:13px;letter-spacing:2px;margin-top:2px}
+.card h4{font-size:11px;letter-spacing:2px;color:var(--purple);margin-bottom:14px;text-transform:uppercase}
+/* rings */
+.rings{display:flex;justify-content:space-around}
+.ring{position:relative;width:74px;height:74px}
+.ring svg{transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .lbl b{font-size:16px}.ring .lbl span{font-size:9px;color:var(--dim);letter-spacing:1px}
+.sysrow{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:9px;color:var(--dim)}.sysrow b{color:var(--green)}
+.sysrow:last-child{margin-bottom:0}
+/* main terminal left */
+.win{position:fixed;border-radius:13px;overflow:hidden;z-index:10;background:rgba(33,34,44,.85);backdrop-filter:blur(20px);border:1px solid var(--bd);box-shadow:0 26px 62px rgba(0,0,0,.55);animation:pop .5s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tb{height:32px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(33,34,44,.7);border-bottom:1px solid var(--bd);font-size:11.5px;color:var(--dim)}
+.dots{display:flex;gap:6px}.dd{width:11px;height:11px;border-radius:50%}.r{background:var(--red)}.y{background:var(--yellow)}.g{background:var(--green)}
+.body{padding:14px 16px;font-size:12.5px;line-height:1.65}
+.term{top:80px;left:60px;width:520px}
+.nf{display:flex;gap:18px}.asc{color:var(--purple);font-size:11px;line-height:1.2;white-space:pre;text-shadow:0 0 12px rgba(189,147,249,.6)}
+.info b{color:var(--pink)}.info .k{color:var(--cyan);font-weight:700}
+.sw{display:flex;gap:5px;margin-top:7px}.sw i{width:14px;height:14px;border-radius:4px;display:block}
+.pr{margin-top:11px;color:var(--green)}.pr .c{color:var(--cyan)}.cur2{display:inline-block;width:7px;height:14px;background:var(--fg);animation:bl 1s steps(1) infinite;vertical-align:-2px}@keyframes bl{50%{opacity:0}}
+.code{top:330px;left:120px;width:400px}
+.ln{color:var(--dim);width:20px;display:inline-block;text-align:right;margin-right:13px}
+.kw{color:var(--pink)}.fn{color:var(--green)}.st{color:var(--yellow)}.nm{color:var(--purple)}.cm{color:var(--dim);font-style:italic}.at{color:var(--cyan)}
+.dock{position:fixed;bottom:18px;left:calc(50% - 150px);transform:translateX(-50%);z-index:60;display:flex;gap:10px;padding:9px 14px;border-radius:18px;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--bd);box-shadow:0 12px 38px rgba(0,0,0,.45)}
+.app{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:21px;transition:.18s cubic-bezier(.2,.9,.3,1.4);cursor:pointer;background:rgba(248,248,242,.04)}.app:hover{transform:translateY(-12px) scale(1.18);background:rgba(189,147,249,.2)}
+.tag{position:fixed;bottom:20px;left:16px;z-index:40;font-size:11px;color:var(--dim)}
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<div class="conky">
+<div class="card bigtime"><div class="t" id="clk">--:--</div><div class="d" id="dt">———</div></div>
+<div class="card"><h4>◆ Resources</h4><div class="rings">
+<div class="ring"><svg width="74" height="74"><circle cx="37" cy="37" r="31" stroke="#44475a" stroke-width="6" fill="none"/><circle cx="37" cy="37" r="31" stroke="#50fa7b" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="170"/></svg><div class="lbl"><b>13%</b><span>CPU</span></div></div>
+<div class="ring"><svg width="74" height="74"><circle cx="37" cy="37" r="31" stroke="#44475a" stroke-width="6" fill="none"/><circle cx="37" cy="37" r="31" stroke="#bd93f9" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="160"/></svg><div class="lbl"><b>18%</b><span>RAM</span></div></div>
+<div class="ring"><svg width="74" height="74"><circle cx="37" cy="37" r="31" stroke="#44475a" stroke-width="6" fill="none"/><circle cx="37" cy="37" r="31" stroke="#ff79c6" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="180"/></svg><div class="lbl"><b>8%</b><span>GPU</span></div></div></div></div>
+<div class="card"><h4>◆ System</h4>
+<div class="sysrow"><span>Host</span><b>nixstation</b></div><div class="sysrow"><span>GPU</span><b>RTX 4080</b></div><div class="sysrow"><span>GPU Temp</span><b>38°C</b></div><div class="sysrow"><span>Driver</span><b>nvidia-open</b></div><div class="sysrow"><span>Uptime</span><b>2d 4h</b></div><div class="sysrow"><span>Generation</span><b>#47</b></div></div>
+</div>
+<div class="win term"><div class="tb"><div class="dots"><span class="dd r"></span><span class="dd y"></span><span class="dd g"></span></div>&nbsp;wezterm — fish</div>
+<div class="body"><div class="nf"><pre class="asc">  .-.    .-.
+ (   \  /   )
+  '.  \/  .'
+    \    /
+   __\  /__
+  (        )
+   '.____.'
+   D R A C U L A</pre>
+<div class="info"><span class="k">bobby@nixstation</span><br>──────────────<br><b>OS</b> NixOS 25.11 x86_64<br><b>Kernel</b> 6.18-zen<br><b>DE</b> Plasma 6.5 Wayland<br><b>CPU</b> Ryzen 7 3800XT<br><b>GPU</b> RTX 4080 [open]<br><b>RAM</b> 5.8/32 GiB
+<div class="sw"><i style="background:var(--red)"></i><i style="background:var(--orange)"></i><i style="background:var(--yellow)"></i><i style="background:var(--green)"></i><i style="background:var(--cyan)"></i><i style="background:var(--purple)"></i><i style="background:var(--pink)"></i></div></div></div>
+<div class="pr">❯ <span class="c">git</span> commit -m "rice complete" <span class="cur2"></span></div></div></div>
+<div class="win code"><div class="tb"><div class="dots"><span class="dd r"></span><span class="dd y"></span><span class="dd g"></span></div>&nbsp;home.nix</div>
+<div class="body"><div><span class="ln">22</span><span class="kw">wayland</span>.<span class="fn">windowManager</span>.<span class="at">hyprland</span> = {</div><div><span class="ln">23</span>&nbsp;&nbsp;<span class="at">enable</span> = <span class="nm">true</span>;</div><div><span class="ln">24</span>&nbsp;&nbsp;<span class="at">settings</span>.<span class="fn">decoration</span>.<span class="at">blur</span> = <span class="nm">true</span>;</div><div><span class="ln">25</span>};</div></div></div>
+<div class="dock"><div class="app">📁</div><div class="app">🌐</div><div class="app">🖥️</div><div class="app">📝</div><div class="app">🎮</div><div class="app">🎵</div></div>
+<div class="tag">Dracula · Conky widget column + rings</div>
+<script>function t(){const d=new Date();document.getElementById('clk').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');document.getElementById('dt').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase()}t();setInterval(t,1000);</script>
+</body></html>

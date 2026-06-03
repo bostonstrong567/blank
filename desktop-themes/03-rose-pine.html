@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Rosé Pine — NixOS rice</title>
+<style>
+:root{--base:#191724;--surface:#1f1d2e;--overlay:#26233a;--muted:#6e6a86;--subtle:#908caa;--text:#e0def4;--love:#eb6f92;--gold:#f6c177;--rose:#ebbcba;--pine:#31748f;--foam:#9ccfd8;--iris:#c4a7e7;--glass:rgba(25,23,36,.5);--bd:rgba(224,222,244,.08);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:"SF Pro Display","Inter",system-ui,sans-serif;color:var(--text)}
+body{background:radial-gradient(1000px 800px at 30% 20%,#26233a,#191724 65%);position:relative;display:flex;align-items:center;justify-content:center}
+.glow{position:fixed;border-radius:50%;filter:blur(120px);opacity:.3;z-index:0}
+.g1{width:500px;height:500px;background:var(--iris);top:-140px;left:-40px}
+.g2{width:420px;height:420px;background:var(--rose);bottom:-120px;right:-40px;opacity:.22}
+.g3{width:300px;height:300px;background:var(--foam);top:50%;left:60%;opacity:.18}
+/* center zen widget */
+.center{position:relative;z-index:10;text-align:center;animation:fade 1s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.bigclk{font-size:120px;font-weight:200;letter-spacing:4px;line-height:1;background:linear-gradient(120deg,var(--rose),var(--iris),var(--foam));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 60px rgba(196,167,231,.3)}
+.date{font-size:18px;color:var(--subtle);font-weight:300;margin-top:6px;letter-spacing:3px}
+.quote{margin-top:34px;font-size:15px;color:var(--muted);font-style:italic;font-weight:300;max-width:440px}
+.quote b{color:var(--rose);font-style:normal}
+/* greeting card top */
+.greet{position:fixed;top:34px;left:38px;z-index:20;font-size:15px;color:var(--subtle);font-weight:300}
+.greet b{color:var(--text);font-weight:500}
+/* floating glass info pill top-right */
+.sys{position:fixed;top:30px;right:34px;z-index:20;display:flex;gap:8px}
+.chip{display:flex;align-items:center;gap:7px;padding:9px 15px;border-radius:14px;background:var(--glass);backdrop-filter:blur(22px) saturate(1.3);border:1px solid var(--bd);font-size:12.5px;font-weight:300;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.chip b{color:var(--iris);font-weight:500}
+/* dock, subtle, fades up */
+.dock{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:14px;padding:11px 18px;border-radius:22px;background:var(--glass);backdrop-filter:blur(26px) saturate(1.4);border:1px solid var(--bd);box-shadow:0 14px 48px rgba(0,0,0,.4);opacity:.55;transition:.4s}
+.dock:hover{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.app{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:23px;transition:.2s cubic-bezier(.2,.9,.3,1.4);cursor:pointer}
+.app:hover{transform:translateY(-14px) scale(1.2)}
+/* music mini */
+.mini{position:fixed;bottom:30px;left:34px;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 16px 12px 12px;border-radius:18px;background:var(--glass);backdrop-filter:blur(22px);border:1px solid var(--bd);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+.art{width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--rose),var(--iris));box-shadow:0 6px 16px rgba(235,188,186,.4)}
+.tr{font-size:13px;font-weight:500}.ar{font-size:11px;color:var(--muted)}
+.tag{position:fixed;bottom:30px;right:34px;z-index:40;font-size:11px;color:var(--muted);background:var(--glass);padding:6px 12px;border-radius:12px;border:1px solid var(--bd);backdrop-filter:blur(10px)}
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+<div class="greet">good evening, <b>bobby</b> 🌙</div>
+<div class="sys"><div class="chip">󰢮 <b>RTX 4080</b></div><div class="chip">󰾆 <b>5.8/32G</b></div><div class="chip">❄ <b>NixOS</b></div></div>
+<div class="center"><div class="bigclk" id="bc">--:--</div><div class="date" id="dt">———</div>
+<div class="quote">"the details are not the details. <b>they make the design.</b>"</div></div>
+<div class="mini"><div class="art"></div><div><div class="tr">Holocene</div><div class="ar">Bon Iver</div></div></div>
+<div class="dock"><div class="app">📁</div><div class="app">🌐</div><div class="app">🖥️</div><div class="app">📝</div><div class="app">🎮</div><div class="app">🎵</div><div class="app">⚙️</div></div>
+<div class="tag">Rosé Pine · minimal zen</div>
+<script>function t(){const d=new Date();document.getElementById('bc').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');document.getElementById('dt').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase()}t();setInterval(t,1000);</script>
+</body></html>

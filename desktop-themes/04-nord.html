@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Nord — NixOS rice (tiling)</title>
+<style>
+:root{--n0:#2e3440;--n1:#3b4252;--n2:#434c5e;--n3:#4c566a;--n4:#d8dee9;--n5:#e5e9f0;--n6:#eceff4;--f7:#8fbcbb;--f8:#88c0d0;--f9:#81a1c1;--f10:#5e81ac;--red:#bf616a;--orange:#d08770;--yellow:#ebcb8b;--green:#a3be8c;--purple:#b48ead;--glass:rgba(46,52,64,.7);--bd:rgba(216,222,233,.10);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--n4)}
+body{background:linear-gradient(135deg,#2e3440,#3b4252 50%,#2e3440);position:relative}
+.glow{position:fixed;border-radius:50%;filter:blur(120px);opacity:.3;z-index:0}.g1{width:460px;height:460px;background:var(--f10);top:-120px;right:-40px}.g2{width:380px;height:380px;background:var(--f8);bottom:-120px;left:-60px;opacity:.2}
+/* top bar */
+.bar{position:fixed;top:8px;left:8px;right:8px;height:32px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-radius:9px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--bd);font-size:12px}
+.bar .l{display:flex;gap:6px;align-items:center}.bar .l .lo{color:var(--f8);font-weight:700}
+.bar .l .t{padding:2px 9px;border-radius:6px;color:var(--n3)}.bar .l .t.on{background:var(--f10);color:var(--n6);font-weight:700}
+.bar .r{display:flex;gap:15px}.bar .r b{color:var(--f7)}#clk{color:var(--f8);font-weight:700}
+/* tiling grid */
+.grid{position:fixed;top:48px;left:8px;right:8px;bottom:8px;z-index:10;display:grid;grid-template-columns:1.4fr 1fr;grid-template-rows:1fr 1fr;gap:8px}
+.win{border-radius:9px;overflow:hidden;background:rgba(59,66,82,.7);backdrop-filter:blur(16px);border:1px solid var(--bd);box-shadow:0 14px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;animation:pop .5s ease both}
+.win.focus{border:1px solid var(--f8);box-shadow:0 0 0 1px var(--f8),0 14px 40px rgba(0,0,0,.5)}
+@keyframes pop{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:none}}
+.win.span2{grid-row:span 2}
+.tb{height:28px;display:flex;align-items:center;gap:7px;padding:0 11px;background:rgba(46,52,64,.6);border-bottom:1px solid var(--bd);font-size:11px;color:var(--n3)}
+.tb .ti{color:var(--n4)}.tb .badge{margin-left:auto;font-size:9.5px;padding:1px 6px;border-radius:4px;background:var(--n2);color:var(--f7)}
+.body{flex:1;padding:13px 15px;font-size:12px;line-height:1.6;overflow:auto}
+.asc{color:var(--f8);font-size:10.5px;line-height:1.2;white-space:pre}
+.nf{display:flex;gap:14px}.info b{color:var(--purple)}.info .k{color:var(--f8);font-weight:700}
+.pr{color:var(--green)}.pr .c{color:var(--f7)}.cur{display:inline-block;width:7px;height:13px;background:var(--n4);animation:bl 1s steps(1) infinite;vertical-align:-2px}@keyframes bl{50%{opacity:0}}
+.ln{color:var(--n3);width:18px;display:inline-block;text-align:right;margin-right:11px}
+.kw{color:var(--purple)}.fn{color:var(--f8)}.st{color:var(--green)}.nm{color:var(--orange)}.cm{color:var(--n3);font-style:italic}.at{color:var(--f7)}
+/* system monitor bars */
+.mon .body{display:flex;flex-direction:column;gap:13px;justify-content:center}
+.met{font-size:11.5px}.met .lab{display:flex;justify-content:space-between;margin-bottom:5px}.met .lab b{color:var(--f8)}
+.barr{height:7px;border-radius:4px;background:rgba(216,222,233,.12);overflow:hidden}.barr i{display:block;height:100%;border-radius:4px}
+.web .body{padding:0}.webhdr{height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--n1);font-size:11px;color:var(--n4)}.urlbar{flex:1;background:var(--n0);border-radius:6px;padding:4px 10px;color:var(--n3);font-size:10.5px}
+.webcontent{padding:18px;text-align:center}.webcontent h2{color:var(--f8);font-size:17px;margin-bottom:6px}.webcontent p{color:var(--n3);font-size:11.5px}
+.tag{position:fixed;bottom:14px;right:18px;z-index:40;font-size:11px;color:var(--n3)}
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<div class="bar"><div class="l"><span class="lo">❄ Nord</span><span class="t on">term</span><span class="t">web</span><span class="t">code</span><span class="t">sys</span></div><div class="r"><span>󰍛 <b>11%</b></span><span>󰾆 <b>5.8G</b></span><span>󰢮 <b>38°</b></span><span id="clk">--:--</span></div></div>
+<div class="grid">
+<div class="win span2 focus"><div class="tb"><span class="ti">🖥️ kitty — fish</span><span class="badge">MASTER</span></div>
+<div class="body"><div class="nf"><pre class="asc">    /\\
+   /  \\    ___
+  / /\ \\  | _ \\
+ / ____ \\ |   /
+/_/    \\_\\|_|_\\
+   N O R D</pre>
+<div class="info"><span class="k">bobby@nixstation</span><br>──────────<br><b>OS</b> NixOS 25.11<br><b>WM</b> Hyprland (tiling)<br><b>CPU</b> Ryzen 7 3800XT<br><b>GPU</b> RTX 4080<br><b>Bar</b> Waybar<br><b>RAM</b> 5.8/32G</div></div>
+<div class="pr" style="margin-top:12px">❯ <span class="c">sudo</span> nixos-rebuild switch<span class="cur"></span></div>
+<div style="margin-top:8px;color:var(--n3);font-size:11px">→ building system... <span style="color:var(--green)">✓ 1284 derivations</span><br>→ activating <span style="color:var(--f8)">generation 47</span></div></div></div>
+<div class="win web"><div class="webhdr">🌐 <div class="urlbar">https://nixos.org/manual</div></div><div class="webcontent" style="padding:22px"><h2>❄ NixOS Manual</h2><p>declarative · reproducible · atomic</p><p style="margin-top:10px;color:var(--green)">generation 47 · rollback always available</p></div></div>
+<div class="win mon"><div class="tb"><span class="ti">📊 btop</span><span class="badge">STACK</span></div><div class="body">
+<div class="met"><div class="lab"><span>CPU · Ryzen 7 3800XT</span><b>11%</b></div><div class="barr"><i style="width:11%;background:var(--green)"></i></div></div>
+<div class="met"><div class="lab"><span>GPU · RTX 4080</span><b>4%</b></div><div class="barr"><i style="width:8%;background:var(--f8)"></i></div></div>
+<div class="met"><div class="lab"><span>RAM</span><b>5.8 / 32 G</b></div><div class="barr"><i style="width:18%;background:var(--purple)"></i></div></div>
+<div class="met"><div class="lab"><span>VRAM</span><b>1.2 / 16 G</b></div><div class="barr"><i style="width:8%;background:var(--yellow)"></i></div></div></div></div>
+</div>
+<div class="tag">Nord · tiling-WM grid (auto-arranged)</div>
+<script>function t(){const d=new Date();document.getElementById('clk').textContent='󰥔 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}t();setInterval(t,1000);</script>
+</body></html>
