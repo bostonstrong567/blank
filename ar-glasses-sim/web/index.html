@@ -134,18 +134,56 @@ const RESOLUTIONS = {
   low:  { w: 320,  h: 240, label: '240p' },
 };
 const CONF_STEPS = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+const SESSION_KEY = 'ar-glasses-sim-session';
 
-// ─── State ───────────────────────────────────────────────
-let state = {
+// ─── Session persistence ─────────────────────────────────
+const DEFAULT_STATE = {
   resolution: 'med',
   confIdx: 2,
   showScanlines: false,
   showVignette: true,
-  fpsCap: false,       // simulate 15fps hardware cap
-  addLatency: false,    // simulate extra processing delay
-  addNoise: false,      // simulate sensor noise
+  fpsCap: false,
+  addLatency: false,
+  addNoise: false,
   running: true,
 };
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return { ...DEFAULT_STATE };
+    const parsed = JSON.parse(raw);
+    // Validate each field; fall back to default for any corrupt/missing value
+    const valid = { ...DEFAULT_STATE };
+    if (parsed.resolution in RESOLUTIONS) valid.resolution = parsed.resolution;
+    if (Number.isInteger(parsed.confIdx) && parsed.confIdx >= 0 && parsed.confIdx < CONF_STEPS.length)
+      valid.confIdx = parsed.confIdx;
+    if (typeof parsed.showScanlines === 'boolean') valid.showScanlines = parsed.showScanlines;
+    if (typeof parsed.showVignette === 'boolean') valid.showVignette = parsed.showVignette;
+    if (typeof parsed.fpsCap === 'boolean') valid.fpsCap = parsed.fpsCap;
+    if (typeof parsed.addLatency === 'boolean') valid.addLatency = parsed.addLatency;
+    if (typeof parsed.addNoise === 'boolean') valid.addNoise = parsed.addNoise;
+    return valid;
+  } catch (_) {
+    // Corrupted data — clear it and use defaults
+    try { localStorage.removeItem(SESSION_KEY); } catch (_2) {}
+    return { ...DEFAULT_STATE };
+  }
+}
+
+function saveSession() {
+  try {
+    const { resolution, confIdx, showScanlines, showVignette, fpsCap, addLatency, addNoise } = state;
+    localStorage.setItem(SESSION_KEY, JSON.stringify(
+      { resolution, confIdx, showScanlines, showVignette, fpsCap, addLatency, addNoise }
+    ));
+  } catch (_) {
+    // Storage unavailable (private mode quota exceeded, etc.) — ignore
+  }
+}
+
+// ─── State ───────────────────────────────────────────────
+let state = loadSession();
 
 // ─── Metrics ─────────────────────────────────────────────
 let metrics = {
@@ -499,30 +537,36 @@ function setupControls() {
     state.fpsCap = !state.fpsCap;
     document.getElementById('btn-fps-cap').textContent = `FPS Cap: ${state.fpsCap ? '15' : 'OFF'}`;
     document.getElementById('btn-fps-cap').classList.toggle('active', state.fpsCap);
+    saveSession();
   });
   document.getElementById('btn-latency').addEventListener('click', () => {
     state.addLatency = !state.addLatency;
     document.getElementById('btn-latency').textContent = `+Latency: ${state.addLatency ? 'ON' : 'OFF'}`;
     document.getElementById('btn-latency').classList.toggle('active', state.addLatency);
+    saveSession();
   });
   document.getElementById('btn-noise').addEventListener('click', () => {
     state.addNoise = !state.addNoise;
     document.getElementById('btn-noise').textContent = `Noise: ${state.addNoise ? 'ON' : 'OFF'}`;
     document.getElementById('btn-noise').classList.toggle('active', state.addNoise);
+    saveSession();
   });
 
   // Display
   document.getElementById('btn-scanlines').addEventListener('click', () => {
     state.showScanlines = !state.showScanlines;
     document.getElementById('btn-scanlines').classList.toggle('active', state.showScanlines);
+    saveSession();
   });
   document.getElementById('btn-vignette').addEventListener('click', () => {
     state.showVignette = !state.showVignette;
     document.getElementById('btn-vignette').classList.toggle('active', state.showVignette);
+    saveSession();
   });
   document.getElementById('btn-conf').addEventListener('click', () => {
     state.confIdx = (state.confIdx + 1) % CONF_STEPS.length;
     document.getElementById('btn-conf').textContent = `Conf: ${CONF_STEPS[state.confIdx].toFixed(1)}`;
+    saveSession();
   });
   document.getElementById('btn-screenshot').addEventListener('click', () => {
     canvas.toBlob(blob => {
@@ -532,10 +576,25 @@ function setupControls() {
       a.click();
     });
   });
+
+  // Apply restored session state to UI
+  document.getElementById('btn-res-high').classList.toggle('active', state.resolution === 'high');
+  document.getElementById('btn-res-med').classList.toggle('active', state.resolution === 'med');
+  document.getElementById('btn-res-low').classList.toggle('active', state.resolution === 'low');
+  document.getElementById('btn-conf').textContent = `Conf: ${CONF_STEPS[state.confIdx].toFixed(1)}`;
+  document.getElementById('btn-fps-cap').textContent = `FPS Cap: ${state.fpsCap ? '15' : 'OFF'}`;
+  document.getElementById('btn-fps-cap').classList.toggle('active', state.fpsCap);
+  document.getElementById('btn-latency').textContent = `+Latency: ${state.addLatency ? 'ON' : 'OFF'}`;
+  document.getElementById('btn-latency').classList.toggle('active', state.addLatency);
+  document.getElementById('btn-noise').textContent = `Noise: ${state.addNoise ? 'ON' : 'OFF'}`;
+  document.getElementById('btn-noise').classList.toggle('active', state.addNoise);
+  document.getElementById('btn-scanlines').classList.toggle('active', state.showScanlines);
+  document.getElementById('btn-vignette').classList.toggle('active', state.showVignette);
 }
 
 function setRes(key) {
   state.resolution = key;
+  saveSession();
   document.getElementById('btn-res-high').classList.toggle('active', key === 'high');
   document.getElementById('btn-res-med').classList.toggle('active', key === 'med');
   document.getElementById('btn-res-low').classList.toggle('active', key === 'low');
