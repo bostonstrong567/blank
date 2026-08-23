@@ -283,6 +283,24 @@ if not Glue then
     end
 end
 
+local leafSet = Farm.leafSet
+if not leafSet then
+    leafSet = {}
+    Farm.leafSet = leafSet
+end
+
+Glue.bind("leafAdded", LeavesFolder.ChildAdded, function(leaf)
+    leafSet[leaf] = true
+end)
+
+Glue.bind("leafRemoved", LeavesFolder.ChildRemoved, function(leaf)
+    leafSet[leaf] = nil
+end)
+
+for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+    leafSet[leaf] = true
+end
+
 local function getPosition(object)
     local kind = typeof(object)
 
@@ -341,7 +359,7 @@ end
 local function getCurrentLeaves()
     local leaves = {}
 
-    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+    for leaf in pairs(leafSet) do
         local id = leafToId[leaf]
         if id then
             leaves[#leaves + 1] = { id = id, leaf = leaf }
@@ -354,7 +372,7 @@ end
 local function countCurrentLeaves()
     local count = 0
 
-    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+    for leaf in pairs(leafSet) do
         if leafToId[leaf] then
             count = count + 1
         end
@@ -372,7 +390,7 @@ local function getLeafIdsWithin(radius)
     local rootPos = root.Position
     local ids = {}
 
-    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+    for leaf in pairs(leafSet) do
         local id = leafToId[leaf]
         if id then
             local pos = getPosition(leaf)
@@ -386,13 +404,27 @@ local function getLeafIdsWithin(radius)
 end
 
 local function collectWithin(radius)
-    local ids = getLeafIdsWithin(radius or Farm.collectRadius)
-
-    for _, id in ipairs(ids) do
-        CollectLeaf:FireServer(id)
+    local root = getRoot()
+    if not root then
+        return 0
     end
 
-    return #ids
+    radius = radius or Farm.collectRadius
+    local rootPos = root.Position
+    local fired = 0
+
+    for leaf in pairs(leafSet) do
+        local id = leafToId[leaf]
+        if id then
+            local pos = getPosition(leaf)
+            if pos and (pos - rootPos).Magnitude <= radius then
+                CollectLeaf:FireServer(id)
+                fired = fired + 1
+            end
+        end
+    end
+
+    return fired
 end
 
 local dumpster
