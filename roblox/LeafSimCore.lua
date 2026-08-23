@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local Player = Players:FindFirstChild("bostoncheats") or Players.LocalPlayer
 local LeafSim = require(Player.PlayerScripts:WaitForChild("LeafSim"))
@@ -12,19 +11,32 @@ local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local CollectLeaf = Remotes:WaitForChild("CollectLeaf")
 local EmptyBackpack = Remotes:WaitForChild("EmptyBackpack")
 
-local COLLECT_RADIUS = 15
-local COLLECT_INTERVAL = 0.25
-local EMPTY_RADIUS = 21
-local EMPTY_CHECK_INTERVAL = 0.2
-local DUMPSTER_NAME = "Dumpster"
-local COLLECT_TOGGLE_KEY = Enum.KeyCode.F
-local EMPTY_TOGGLE_KEY = Enum.KeyCode.G
-
 local leafToId = debug.getupvalues(LeafSim.collectMany)[3]
 assert(type(leafToId) == "table", "Failed to get leafToId/u30")
 
-local Glue = {}
-do
+local genv = type(getgenv) == "function" and getgenv() or _G
+local Farm = genv.LeafFarm or {}
+genv.LeafFarm = Farm
+
+for key, value in pairs({
+    autoCollect = false,
+    collectRadius = 15,
+    collectInterval = 0.25,
+    autoEmpty = false,
+    emptyRadius = 21,
+    emptyInterval = 0.2,
+    dumpsterName = "Dumpster",
+}) do
+    if Farm[key] == nil then
+        Farm[key] = value
+    end
+end
+
+local Glue = Farm.Glue
+if not Glue then
+    Glue = {}
+    Farm.Glue = Glue
+
     local registry = {}
 
     local function getConnector(signal)
@@ -269,40 +281,6 @@ do
             disconnectOn = options.disconnectOn,
         })
     end
-
-    function Glue.every(key, interval, handler, options)
-        local accumulated = 0
-
-        return Glue.bind(key, RunService.Heartbeat, function(dt)
-            accumulated = accumulated + (dt or 0)
-            if accumulated < interval then
-                return
-            end
-            accumulated = 0
-            handler()
-        end, options)
-    end
-end
-
-local function getLeafId(leaf)
-    return leafToId[leaf]
-end
-
-local function getCurrentLeaves()
-    local leaves = {}
-
-    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
-        local id = leafToId[leaf]
-        if id then
-            leaves[#leaves + 1] = { id = id, leaf = leaf }
-        end
-    end
-
-    return leaves
-end
-
-local function countCurrentLeaves()
-    return #getCurrentLeaves()
 end
 
 local function getPosition(object)
@@ -356,26 +334,59 @@ local function getRoot()
     return character and character:FindFirstChild("HumanoidRootPart")
 end
 
+local function getLeafId(leaf)
+    return leafToId[leaf]
+end
+
+local function getCurrentLeaves()
+    local leaves = {}
+
+    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+        local id = leafToId[leaf]
+        if id then
+            leaves[#leaves + 1] = { id = id, leaf = leaf }
+        end
+    end
+
+    return leaves
+end
+
+local function countCurrentLeaves()
+    local count = 0
+
+    for _, leaf in ipairs(LeavesFolder:GetChildren()) do
+        if leafToId[leaf] then
+            count = count + 1
+        end
+    end
+
+    return count
+end
+
 local function getLeafIdsWithin(radius)
     local root = getRoot()
     if not root then
         return {}
     end
 
+    local rootPos = root.Position
     local ids = {}
 
     for _, leaf in ipairs(LeavesFolder:GetChildren()) do
         local id = leafToId[leaf]
-        if id and checkWithin(root, leaf, radius) then
-            ids[#ids + 1] = id
+        if id then
+            local pos = getPosition(leaf)
+            if pos and (pos - rootPos).Magnitude <= radius then
+                ids[#ids + 1] = id
+            end
         end
     end
 
     return ids
 end
 
-local function collectLeavesWithin(radius)
-    local ids = getLeafIdsWithin(radius or COLLECT_RADIUS)
+local function collectWithin(radius)
+    local ids = getLeafIdsWithin(radius or Farm.collectRadius)
 
     for _, id in ipairs(ids) do
         CollectLeaf:FireServer(id)
@@ -386,8 +397,8 @@ end
 
 local dumpster
 local function getDumpster()
-    if not (dumpster and dumpster.Parent) then
-        dumpster = Workspace:FindFirstChild(DUMPSTER_NAME, true)
+    if not (dumpster and dumpster.Parent and dumpster.Name == Farm.dumpsterName) then
+        dumpster = Workspace:FindFirstChild(Farm.dumpsterName, true)
     end
     return dumpster
 end
@@ -400,29 +411,53 @@ local function isNearDumpster(radius)
         return false, math.huge
     end
 
-    return checkWithin(root, target, radius or EMPTY_RADIUS)
+    return checkWithin(root, target, radius or Farm.emptyRadius)
 end
 
-Glue.every("autoCollectLeaves", COLLECT_INTERVAL, function()
-    collectLeavesWithin(COLLECT_RADIUS)
-end, { enabled = false })
-
-Glue.watch("autoEmptyBackpack", function()
-    return isNearDumpster(EMPTY_RADIUS)
-end, function()
-    EmptyBackpack:FireServer()
-end, { once = false, interval = EMPTY_CHECK_INTERVAL, enabled = false })
-
-Glue.bind("toggleKeybinds", UserInputService.InputBegan, function(input, gameProcessed)
-    if gameProcessed then
+local collectClock = 0
+Glue.bind("collectLoop", RunService.Heartbeat, function(dt)
+    if not Farm.autoCollect then
         return
     end
 
-    if input.KeyCode == COLLECT_TOGGLE_KEY then
-        print("autoCollectLeaves:", Glue.toggle("autoCollectLeaves"))
-    elseif input.KeyCode == EMPTY_TOGGLE_KEY then
-        print("autoEmptyBackpack:", Glue.toggle("autoEmptyBackpack"))
+    collectClock = collectClock + dt
+    if collectClock < Farm.collectInterval then
+        return
     end
+    collectClock = 0
+
+    collectWithin(Farm.collectRadius)
 end)
 
-print("Current leaves:", countCurrentLeaves())
+local emptyClock = 0
+local wasNearDumpster = false
+Glue.bind("emptyLoop", RunService.Heartbeat, function(dt)
+    if not Farm.autoEmpty then
+        wasNearDumpster = false
+        return
+    end
+
+    emptyClock = emptyClock + dt
+    if emptyClock < Farm.emptyInterval then
+        return
+    end
+    emptyClock = 0
+
+    local near = isNearDumpster(Farm.emptyRadius)
+    if near and not wasNearDumpster then
+        EmptyBackpack:FireServer()
+    end
+    wasNearDumpster = near
+end)
+
+Farm.getLeafId = getLeafId
+Farm.getLeaves = getCurrentLeaves
+Farm.countLeaves = countCurrentLeaves
+Farm.getLeafIdsWithin = getLeafIdsWithin
+Farm.collectWithin = collectWithin
+Farm.getDumpster = getDumpster
+Farm.isNearDumpster = isNearDumpster
+Farm.isWithin = isWithin
+Farm.emptyNow = function() return EmptyBackpack:FireServer() end
+
+print("LeafFarm loaded | leaves:", countCurrentLeaves())
