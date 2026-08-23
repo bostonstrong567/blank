@@ -1,10 +1,24 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Player = Players:FindFirstChild("bostoncheats") or Players.LocalPlayer
 local LeafSim = require(Player.PlayerScripts:WaitForChild("LeafSim"))
 local LeavesFolder = Workspace:WaitForChild("Leaves")
+
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local CollectLeaf = Remotes:WaitForChild("CollectLeaf")
+local EmptyBackpack = Remotes:WaitForChild("EmptyBackpack")
+
+local COLLECT_RADIUS = 15
+local COLLECT_INTERVAL = 0.25
+local EMPTY_RADIUS = 21
+local EMPTY_CHECK_INTERVAL = 0.2
+local DUMPSTER_NAME = "Dumpster"
+local COLLECT_TOGGLE_KEY = Enum.KeyCode.F
+local EMPTY_TOGGLE_KEY = Enum.KeyCode.G
 
 local leafToId = debug.getupvalues(LeafSim.collectMany)[3]
 assert(type(leafToId) == "table", "Failed to get leafToId/u30")
@@ -255,6 +269,19 @@ do
             disconnectOn = options.disconnectOn,
         })
     end
+
+    function Glue.every(key, interval, handler, options)
+        local accumulated = 0
+
+        return Glue.bind(key, RunService.Heartbeat, function(dt)
+            accumulated = accumulated + (dt or 0)
+            if accumulated < interval then
+                return
+            end
+            accumulated = 0
+            handler()
+        end, options)
+    end
 end
 
 local function getLeafId(leaf)
@@ -324,10 +351,13 @@ local function isWithin(a, b, radius, handler, options)
     end, handler, options)
 end
 
-local function getNearbyLeafIds(radius)
+local function getRoot()
     local character = Players.LocalPlayer.Character
-    local root = character and character:FindFirstChild("HumanoidRootPart")
+    return character and character:FindFirstChild("HumanoidRootPart")
+end
 
+local function getLeafIdsWithin(radius)
+    local root = getRoot()
     if not root then
         return {}
     end
@@ -336,12 +366,63 @@ local function getNearbyLeafIds(radius)
 
     for _, leaf in ipairs(LeavesFolder:GetChildren()) do
         local id = leafToId[leaf]
-        if id and isWithin(root, leaf, radius) then
+        if id and checkWithin(root, leaf, radius) then
             ids[#ids + 1] = id
         end
     end
 
     return ids
 end
+
+local function collectLeavesWithin(radius)
+    local ids = getLeafIdsWithin(radius or COLLECT_RADIUS)
+
+    for _, id in ipairs(ids) do
+        CollectLeaf:FireServer(id)
+    end
+
+    return #ids
+end
+
+local dumpster
+local function getDumpster()
+    if not (dumpster and dumpster.Parent) then
+        dumpster = Workspace:FindFirstChild(DUMPSTER_NAME, true)
+    end
+    return dumpster
+end
+
+local function isNearDumpster(radius)
+    local root = getRoot()
+    local target = getDumpster()
+
+    if not (root and target) then
+        return false, math.huge
+    end
+
+    return checkWithin(root, target, radius or EMPTY_RADIUS)
+end
+
+Glue.every("autoCollectLeaves", COLLECT_INTERVAL, function()
+    collectLeavesWithin(COLLECT_RADIUS)
+end, { enabled = false })
+
+Glue.watch("autoEmptyBackpack", function()
+    return isNearDumpster(EMPTY_RADIUS)
+end, function()
+    EmptyBackpack:FireServer()
+end, { once = false, interval = EMPTY_CHECK_INTERVAL, enabled = false })
+
+Glue.bind("toggleKeybinds", UserInputService.InputBegan, function(input, gameProcessed)
+    if gameProcessed then
+        return
+    end
+
+    if input.KeyCode == COLLECT_TOGGLE_KEY then
+        print("autoCollectLeaves:", Glue.toggle("autoCollectLeaves"))
+    elseif input.KeyCode == EMPTY_TOGGLE_KEY then
+        print("autoEmptyBackpack:", Glue.toggle("autoEmptyBackpack"))
+    end
+end)
 
 print("Current leaves:", countCurrentLeaves())
